@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->integer('point')->default(0);
             $table->integer('type')->default(0);
             $table->string("about")->nullable();
-            $table->integer('trusted')->default(0);#-1 cannot 0 normal 1 trusted
+            $table->integer('trusted')->default(0);#-1 cannot 0 normal 1 trusted 10 admin
             $table->rememberToken();
             $table->timestamps();
         });

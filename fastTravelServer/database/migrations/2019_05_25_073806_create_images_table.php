@@ -23,7 +23,7 @@ class CreateImagesTable extends Migration
             $table->bigInteger('touris_spot_id')->default(0);#0: dont know where
             $table->bigInteger('like_count')->default(0);
             $table->bigInteger('dislike_count')->default(0);
-            $table->integer('trusted')->default(0);#-1 cannot 0 normal 1 trusted
+            $table->integer('trusted')->default(0);#-1 cannot 0 normal 1 trusted 2 default
             $table->string("hashtag")->nullable();
             $table->timestamps();
         });

@@ -18,3 +18,11 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/admin/tourist_spot/add', 'adminTouristSpotController@addTouristSpotSite');
+
+Route::post('/admin/tourist_spot/add', 'adminTouristSpotController@addTouristSpot');
+
+Route::get('/admin/tourist_spot/all/{page}/{level_start}/{level_end}', 'adminTouristSpotController@showAllTouristSpots');
+
+Route::get('/admin/tourist_spot/show/{spot_id}', 'adminTouristSpotController@showTouristSpot');

@@ -27,6 +27,7 @@ class CreateTouristSpotsTable extends Migration
             $table->bigInteger('like_count')->default(0);
             $table->bigInteger('dislike_count')->default(0);
             $table->string("about")->nullable();
+            #""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""#
             $table->string("what_to_expect")->nullable();
             $table->string("activity_infomation")->nullable();
             $table->string("insider_tip")->nullable();
