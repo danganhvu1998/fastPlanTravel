@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\touristSpots;
+use Carbon\Carbon;
+use App\images;
+use Illuminate\Support\Facades\Auth;
 
 class adminTouristSpotController extends Controller
 {
@@ -47,21 +50,95 @@ class adminTouristSpotController extends Controller
             ->take($takeNumber)
             ->select("id")
             ->get();
-        $spotsFullInfo = $this->touristSpotFullInfomation($spots);
+        $spotsFullInfo = $this->touristSpotFullInfomation($spots, 2, 0);
         $data = array(
             "spots" => $spotsFullInfo,
         );
         return view('admin.touristSpotShowAll')->with($data);
     }
 
-    public function touristSpotFullInfomation($spots, $numImgNeed=1){
+    public function touristSpotImage($spot_id, $numImgNeed=3, $numSkipTimes=0){
+        $level = touristSpots::where("id", $spot_id)->first()->level;
+        $where = "level_".$level."_spot_id";
+        $images = images::where($where, $spot_id)
+            ->orderBy("trusted", "desc")
+            ->orderBy("like_count", "desc")
+            ->skip($numImgNeed*$numSkipTimes)
+            ->take($numImgNeed)
+            ->get();
+        return $images;
+    }
+
+    public function touristSpotFullInfomation($spots, $numImgNeed=3, $numSkipTimes=0){
         $spotsFullInfo = touristSpots::whereIn("id", $spots)->get();
+        foreach ($spotsFullInfo as $spot){
+            $spot->images = $this->touristSpotImage($spot->id, $numImgNeed, $numSkipTimes);
+        }
         return $spotsFullInfo;
     }
 
-    public function showTouristSpot($spot_id){
+    public function editTouristSpot(request $request){
+        $request->validate([
+            'spot_id' => 'required',
+            'name' => 'required',
+            "level"  => 'required',
+            "about"  => 'required',
+            "type"  => 'required',
+            "upper_spot1_id"  => 'required',
+            "upper_spot_id"  => 'required',
+            "hashtag"  => 'required',
+            "typical_spending_dollar"  => 'required',
+        ]);
+        touristSpots::where("id", $request->spot_id)
+            ->update([
+                "name" => $request->name,
+                "level" => $request->level,
+                "about" => $request->about,
+                "type" => $request->type,
+                "upper_spot1_id" => $request->upper_spot1_id,
+                "upper_spot_id" => $request->upper_spot_id,
+                "hashtag" => $request->hashtag,
+                "typical_spending_dollar" => $request->typical_spending_dollar,
+            ]);
+        return back()->with("message", "Success");
+    }
+
+    public function uploadImageToSpot(request $request){
+        $request->validate([
+            'image' => 'max:1999|image|required  ',
+        ]);
+        // Filename to store
+        $fileNameToStore = Carbon::now()->timestamp."-".random_int ( 0 , 1000000 ).".".$request->file('image')->getClientOriginalExtension();
+        // Upload File
+        $path = $request->file('image')->storeAs('public/images/', $fileNameToStore);
+        $image = new images;
+        $image->link = '/storage/images/'.$fileNameToStore;
+        $image->about = $request->about;
+        $image->hashtag = $request->hashtag;
+        $image->trusted = 2;
+        $image->user_id = Auth::user()->id;
+        $image->tourist_spot_id = $request->spot_id;
+        ######################################################
+        $spot = touristSpots::where("id", $request->spot_id) ->first();
+        while(1){
+            $where = "level_".$spot->level."_spot_id";
+            $image[$where] = $spot->id;
+            if($spot->upper_spot_id==0) break;
+            $spot = touristSpots::where("id", $spot->upper_spot_id) ->first();
+        }
+        ######################################################
+        $image->save();
+        return back()->with("message", "Success");
+        return $request;
+    }
+
+    public function showTouristSpotSite($spot_id){
         $array = array ($spot_id);
-        $spotFullInfo = $this->touristSpotFullInfomation($array)[0];
+        $spotFullInfo = $this->touristSpotFullInfomation($array, 9, 0)[0];
+        $data = array (
+            "spot" => $spotFullInfo,
+        );
+        return view('admin.touristSpotShowInfo')->with($data);
         return $spotFullInfo;
     }
 }

@@ -15,16 +15,16 @@ class CreateImagesTable extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer("type")->nullable();
-            $table->string("link")->default("/system/default_spot_image.jpg");
-            $table->string("about");
+            $table->integer("type")->nullable();#comment=0 user_contribute=1 blog=2 spot=3
+            $table->string("link", 500)->default("/system/default_spot_image.jpg");
+            $table->text("about")->nullable();
             $table->bigInteger('user_id')->default(0);#0: dont know user
             $table->bigInteger('blog_id')->default(0);#0: dont know blog
-            $table->bigInteger('touris_spot_id')->default(0);#0: dont know where
+            $table->bigInteger('tourist_spot_id')->default(0);#0: dont know where
             $table->bigInteger('like_count')->default(0);
             $table->bigInteger('dislike_count')->default(0);
             $table->integer('trusted')->default(0);#-1 cannot 0 normal 1 trusted 2 default
-            $table->string("hashtag")->nullable();
+            $table->text("hashtag")->nullable();
             $table->timestamps();
         });
     }

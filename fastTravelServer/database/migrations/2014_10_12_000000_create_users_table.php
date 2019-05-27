@@ -18,11 +18,11 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('img_link')->default('/system/default_avata_image.jpg');
+            $table->text('password');
+            $table->string('img_link', 500)->default('/system/default_avata_image.jpg');
             $table->integer('point')->default(0);
             $table->integer('type')->default(0);
-            $table->string("about")->nullable();
+            $table->text("about")->nullable();
             $table->integer('trusted')->default(0);#-1 cannot 0 normal 1 trusted 10 admin
             $table->rememberToken();
             $table->timestamps();

@@ -25,4 +25,8 @@ Route::post('/admin/tourist_spot/add', 'adminTouristSpotController@addTouristSpo
 
 Route::get('/admin/tourist_spot/all/{page}/{level_start}/{level_end}', 'adminTouristSpotController@showAllTouristSpots');
 
-Route::get('/admin/tourist_spot/show/{spot_id}', 'adminTouristSpotController@showTouristSpot');
+Route::get('/admin/tourist_spot/show/{spot_id}', 'adminTouristSpotController@showTouristSpotSite');
+
+Route::post('/admin/tourist_spot/edit', 'adminTouristSpotController@editTouristSpot');
+
+Route::post('/admin/tourist_spot/upload_image', 'adminTouristSpotController@uploadImageToSpot');
