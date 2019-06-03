@@ -7,6 +7,7 @@ use App\touristSpots;
 use Carbon\Carbon;
 use App\images;
 use Illuminate\Support\Facades\Auth;
+use App\spotInfos;
 
 class adminTouristSpotController extends Controller
 {
@@ -16,7 +17,7 @@ class adminTouristSpotController extends Controller
     }
 
     public function addTouristSpotSite(){
-        return view("admin.touristSpotAdd");
+        return view("admin.touristSpot.touristSpotAdd");
     }
 
     public function addTouristSpot(request $request){
@@ -50,11 +51,11 @@ class adminTouristSpotController extends Controller
             ->take($takeNumber)
             ->select("id")
             ->get();
-        $spotsFullInfo = $this->touristSpotFullInfomation($spots, 2, 0);
+        $spotsFullInfo = $this->touristSpotFullInfomation($spots, 2, 0, 0);
         $data = array(
             "spots" => $spotsFullInfo,
         );
-        return view('admin.touristSpotShowAll')->with($data);
+        return view('admin.touristSpot.touristSpotShowAll')->with($data);
     }
 
     public function touristSpotImage($spot_id, $numImgNeed=3, $numSkipTimes=0){
@@ -69,10 +70,18 @@ class adminTouristSpotController extends Controller
         return $images;
     }
 
-    public function touristSpotFullInfomation($spots, $numImgNeed=3, $numSkipTimes=0){
+    public function touristSpotInfos($spot_id){
+        $infos = spotInfos::where("spot_id", $spot_id)
+            -> select("id", "language", "spot_id")
+            ->get();
+        return $infos;
+    }
+
+    public function touristSpotFullInfomation($spots, $numImgNeed=3, $numSkipTimes=0, $need_info=1){
         $spotsFullInfo = touristSpots::whereIn("id", $spots)->get();
         foreach ($spotsFullInfo as $spot){
             $spot->images = $this->touristSpotImage($spot->id, $numImgNeed, $numSkipTimes);
+            if($need_info) $spot->infos = $this->touristSpotInfos($spot->id);
         }
         return $spotsFullInfo;
     }
@@ -134,11 +143,13 @@ class adminTouristSpotController extends Controller
 
     public function showTouristSpotSite($spot_id){
         $array = array ($spot_id);
-        $spotFullInfo = $this->touristSpotFullInfomation($array, 9, 0)[0];
+        $spotFullInfo = $this->touristSpotFullInfomation($array, 9, 0, 1)[0];
         $data = array (
             "spot" => $spotFullInfo,
         );
-        return view('admin.touristSpotShowInfo')->with($data);
-        return $spotFullInfo;
+        #return $spotFullInfo;
+        return view('admin.touristSpot.touristSpotShowInfo')->with($data);
     }
+
+
 }
